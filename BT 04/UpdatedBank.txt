@@ -1,0 +1,40 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.17; // Declares the Solidity version
+
+// Define a contract named "Bank"
+contract Bank {
+
+    address public accOwner; // Variable to store the account owner's address
+
+    // Constructor function (executed only once when the contract is deployed)
+    constructor() {
+        accOwner = msg.sender; // Assign the deployer of the contract as the owner
+    }
+
+    // Function to deposit money into the contract
+    // `payable` keyword allows the function to receive Ether
+    function depositMoney() public payable {}
+
+    // Function to withdraw money from the contract
+    function withdrawMoney(uint256 ammount) public payable {
+        require(accOwner == msg.sender, "You are not the account owner"); // Ensures only the owner can withdraw
+        require(ammount > 0, "Ammount must be greater than zero"); // Checks that withdrawal amount is greater than zero
+        require(address(this).balance >= ammount, "Not enough balance in the contract"); // Ensures sufficient balance in contract
+        
+        payable(msg.sender).transfer(ammount); // Sends the requested amount to the owner’s wallet
+    }
+
+    // Function to transfer money to another account
+    function transferMoney(address payable recipient, uint256 ammount) public {
+        require(accOwner == msg.sender, "You are not the account owner"); // Only the owner can transfer money
+        require(ammount > 0, "Ammount must be greater than zero"); // Checks that transfer amount is greater than zero
+        require(address(this).balance >= ammount, "Not enough balance in the contract"); // Ensures contract has enough balance
+        
+        recipient.transfer(ammount); // Transfers the specified amount to the recipient's wallet
+    }
+
+    // Function to check the balance of the contract
+    function showBalance() public view returns (uint256) {
+        return address(this).balance; // Returns the total Ether balance of the contract
+    }
+}
